@@ -1,0 +1,53 @@
+version: '2.2'
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.12.1
+    command: --strict.perms=false
+    environment:
+      - ELASTICSEARCH_HOSTS=es:9200
+    volumes:
+      - ${PWD}/filebeat/mongo/:/usr/share/filebeat/mongo/
+      - ${PWD}/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    ports:
+      - 9000:9000
+    networks:
+      - elastic
+
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    container_name: es
+    environment:
+      - node.name=es
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=es
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  kib:
+    image: docker.elastic.co/kibana/kibana:7.12.1
+    container_name: kib
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es:9200
+      ELASTICSEARCH_HOSTS: '["http://es:9200"]'
+    networks:
+      - elastic
+
+volumes:
+  data01:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge

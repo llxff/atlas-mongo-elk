@@ -1,0 +1,22 @@
+{
+  "index_patterns": [
+    "mongo*"
+  ],
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "strings_as_keyword": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

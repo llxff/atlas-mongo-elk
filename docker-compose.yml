@@ -7,6 +7,7 @@ services:
       - ELASTICSEARCH_HOSTS=es:9200
     volumes:
       - ${PWD}/filebeat/mongo/:/usr/share/filebeat/mongo/
+      - ${PWD}/filebeat/filebeat.template.json:/usr/share/filebeat/filebeat.template.json
       - ${PWD}/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
     ports:
       - 9000:9000

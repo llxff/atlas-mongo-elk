@@ -11,14 +11,7 @@ output.elasticsearch:
   username: '${ELASTICSEARCH_USERNAME:}'
   password: '${ELASTICSEARCH_PASSWORD:}'
 
-setup.template.overwrite: true
-setup.template.append_fields:
-- name: line_str
-  type: keyword
-
 processors:
-  - add_cloud_metadata: ~
-  - add_docker_metadata: ~
   - drop_fields:
       fields: ["split_tokens"]
       ignore_missing: true
@@ -26,8 +19,16 @@ processors:
 filebeat.inputs:
   - type: log
     index: mongo
-    tags: ["mongo_json"]
     json:
       keys_under_root: true
     paths:
       - /usr/share/filebeat/mongo/*.json
+
+setup.template.pattern: "mongo*"
+setup.template.overwrite: true
+setup.template.json.name: "mongo"
+setup.template.json.enabled: true
+setup.template.json.path: "filebeat.template.json"
+
+logging.level: info
+logging.to_stderr: true

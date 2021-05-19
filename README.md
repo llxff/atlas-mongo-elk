@@ -8,7 +8,9 @@ Index MongoDB v4.0 logs from Atlas
 
 NB! There is no limit for keywords.
 
-An example of a scripting field to get `reslen` from logs:
+## Useful snippets for scripted fields
+
+### Getting `reslen`
 
 ```painless
 # Language painless
@@ -27,6 +29,76 @@ else {
        return Integer.parseInt(m.group(1))
     } else {
        return 0
+    }
+}
+```
+
+### Information about using indexes
+
+```
+# Language painless
+# Type String
+
+def line_str = doc['line_str.keyword'];
+
+if (line_str.size() == 0) {
+    return ""
+}
+else {
+    def m = /planSummary: (.*?) cursorid/.matcher(line_str.value);
+    if ( m.find() ) {
+       return m.group(1)
+    } else {
+       return ""
+    }
+}
+```
+
+### Information about timeReading
+
+```
+# Language painless
+# Type number
+# Input format Microseconds
+# Output format Milliseconds
+
+def line_str = doc['line_str.keyword'];
+
+if (line_str.size() == 0) {
+    return 0
+}
+else {
+    def m = /timeReadingMicros: ([0-9]+)/.matcher(line_str.value);
+    if ( m.find() ) {
+        try {
+            return Long.parseLong(m.group(1))
+        }
+        catch(Exception e){
+            -1
+        }
+    } else {
+       return 0
+    }
+}
+```
+
+### Collection name
+
+```
+# Language painless
+# Type String
+
+def line_str = doc['line_str.keyword'];
+
+if (line_str.size() == 0) {
+    return ""
+} else {
+    def m = /blinkist-production-elastic\.([a-z_0-9]+?)\scommand/.matcher(line_str.value);
+    if ( m.find() ) {
+        return m.group(1)
+
+    } else {
+        return ""
     }
 }
 ```
